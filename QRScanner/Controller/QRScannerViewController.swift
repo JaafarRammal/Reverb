@@ -76,7 +76,10 @@ class QRScannerViewController: UIViewController {
                 
                 let code = String(qrData!.codeString!.split(separator: "-")[1])
                 
-                if isValid(data: code, compare: self.attendees){
+                if (self.attendees.contains(code)) {
+                    self.attendees.remove(at: (self.attendees.index(of: code)!))
+                
+//                if isValid(data: code, compare: self.attendees){
                     let alertController = UIAlertController(title: "Valid ticket", message:
                            code, preferredStyle: .alert)
                        alertController.addAction(UIAlertAction(title: "Okay", style: .default,handler: {
@@ -106,7 +109,6 @@ class QRScannerViewController: UIViewController {
             print("Initialized")
             let arr = "0"
             self.defaults.set(arr, forKey: "attendees")
-            self.attendees = self.defaults.stringArray(forKey: "attendees")!
         }else{
             self.attendees = self.defaults.stringArray(forKey: "attendees")!
         }
@@ -157,6 +159,7 @@ extension QRScannerViewController: QRScannerViewDelegate {
 
 func isValid(data: String, compare: [String]) -> Bool {
     if(compare.contains(data)){
+//        self.attendees.remove(data)
         return true
     }
     return false
