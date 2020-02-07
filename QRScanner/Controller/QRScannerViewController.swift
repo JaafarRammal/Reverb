@@ -12,6 +12,7 @@ class QRScannerViewController: UIViewController {
     
     let defaults = UserDefaults.standard
     var attendees = [String]()
+    var scanned = [String]()
     
     @IBOutlet weak var scannerView: QRScannerView! {
         didSet {
@@ -83,10 +84,16 @@ class QRScannerViewController: UIViewController {
                                action in
                                self.scannerView.startScanning()
                            }))
-
+//                       remove from list here
+                    self.attendees.removeAll{$0 == code}
+                    self.scanned.append(code)
                        self.present(alertController, animated: true, completion: nil)
                 }else{
-                    let alertController = UIAlertController(title: "Unvalid ticket", message:
+                    var message_text = "Invalid ticket"
+                    if (self.scanned.contains(code)){
+                        message_text = "Ticket already scanned"
+                    }
+                    let alertController = UIAlertController(title: message_text, message:
                             code, preferredStyle: .alert)
                         alertController.addAction(UIAlertAction(title: "Okay", style: .default,handler: {
                                 action in
@@ -106,9 +113,14 @@ class QRScannerViewController: UIViewController {
             print("Initialized")
             let arr = "0"
             self.defaults.set(arr, forKey: "attendees")
-            self.attendees = self.defaults.stringArray(forKey: "attendees")!
+            if (self.attendees.count == 0) {
+                self.attendees = self.defaults.stringArray(forKey: "attendees")!
+            }
         }else{
-            self.attendees = self.defaults.stringArray(forKey: "attendees")!
+            if (self.attendees.count != 0) {
+                self.attendees = self.defaults.stringArray(forKey: "attendees")!
+            }
+            
         }
         
     }
