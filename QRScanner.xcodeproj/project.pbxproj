@@ -15,6 +15,7 @@
 		9236851D22362675005C1AD7 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9236851A22362675005C1AD7 /* QRScannerView.swift */; };
 		9236852322362B1C005C1AD7 /* QRData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9236852222362B1C005C1AD7 /* QRData.swift */; };
 		92368528223635AB005C1AD7 /* UIViewController+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92368527223635AB005C1AD7 /* UIViewController+Alert.swift */; };
+		E81318AA23F5924700CB2506 /* Afrogala.csv in Resources */ = {isa = PBXBuildFile; fileRef = E81318A923F5924700CB2506 /* Afrogala.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		9236851A22362675005C1AD7 /* QRScannerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		9236852222362B1C005C1AD7 /* QRData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRData.swift; sourceTree = "<group>"; };
 		92368527223635AB005C1AD7 /* UIViewController+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Alert.swift"; sourceTree = "<group>"; };
+		E81318A923F5924700CB2506 /* Afrogala.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Afrogala.csv; path = ../../../../../../Downloads/Afrogala.csv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +86,7 @@
 		9236852122362B04005C1AD7 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				E81318A923F5924700CB2506 /* Afrogala.csv */,
 				9236851922362675005C1AD7 /* QRScannerViewController.swift */,
 			);
 			path = Controller;
@@ -172,6 +175,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9236851B22362675005C1AD7 /* Main.storyboard in Resources */,
+				E81318AA23F5924700CB2506 /* Afrogala.csv in Resources */,
 				92368511223624F8005C1AD7 /* LaunchScreen.storyboard in Resources */,
 				9236850E223624F8005C1AD7 /* Assets.xcassets in Resources */,
 			);
@@ -327,13 +331,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WH5ATMJ4E3;
+				DEVELOPMENT_TEAM = LV9SWPQMMS;
 				INFOPLIST_FILE = QRScanner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.pineapple.QRScanner;
+				PRODUCT_BUNDLE_IDENTIFIER = ReverbIntlQRScanner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -345,13 +349,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WH5ATMJ4E3;
+				DEVELOPMENT_TEAM = LV9SWPQMMS;
 				INFOPLIST_FILE = QRScanner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.pineapple.QRScanner;
+				PRODUCT_BUNDLE_IDENTIFIER = ReverbIntlQRScanner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
