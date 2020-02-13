@@ -42,6 +42,8 @@ class QRScannerView: UIView {
         return super.layer as! AVCaptureVideoPreviewLayer
     }
 }
+
+
 extension QRScannerView {
     
     var isRunning: Bool {

@@ -1,3 +1,11 @@
+//
+//  QRScannerViewController.swift
+//  QRCodeReader
+//
+//  Created by KM, Abhilash a on 08/03/19.
+//  Copyright © 2019 KM, Abhilash. All rights reserved.
+//
+
 import UIKit
 
 class QRScannerViewController: UIViewController {
@@ -71,8 +79,14 @@ class QRScannerViewController: UIViewController {
                 let code = String(qrData!.codeString!.split(separator: "-")[1])
 
                 if isValid(data: code, compare: [String](self.orderNums.keys)){
+                    let order = self.orderNums[code]!
+                    if (Int(order[1])! > 1) {
+//                        Have option to select number of tickets being scanned
+                        print("to be done")
+                    }
+                    let output = order[0] + "\n Quantity: " + order[1] + "\n" + order[2]
                     let alertController = UIAlertController(title: "Valid ticket", message:
-                           code, preferredStyle: .alert)
+                           output, preferredStyle: .alert)
                        alertController.addAction(UIAlertAction(title: "Okay", style: .default,handler: {
                                action in
                                self.scannerView.startScanning()
@@ -96,7 +110,6 @@ class QRScannerViewController: UIViewController {
                         self.present(alertController, animated: true, completion: nil)
                     }
                 }
-
         }
     }
     
@@ -143,29 +156,15 @@ class QRScannerViewController: UIViewController {
         for row in csvRows {
             if (row[0] != "") {
                 let pointsArr = row[0].components(separatedBy: ",")
-//              Values represent - 
+//              Values represent - name, ticket quantity, ticket type
                 self.orderNums[pointsArr[7]] = [pointsArr[2], pointsArr[3], pointsArr[4]]
             }
         }
         print(self.orderNums)
         print(self.orderNums.count)
-
         
-        
-//        csvRows.dropFirst()
-//        csvRows.dropLast()
-//        print(csvRows[4][0])
-//        var pointsArr = csvRows[4][0].components(separatedBy: ",")
-////            csvRows[4][0].componentsSeparatedByString(",")
-//
-//        print(pointsArr) // UXM n. 166/167
-//        print(pointsArr.count) // UXM n. 166/167
-//        print(pointsArr[7]) // UXM n. 166/167
-
-
     }
     
-//    ["\"January 15, 2020\",Anu Olatidoye,2,Show + Food,15,30,8458,,\"£1,247.40\""]
     
     func csv(data: String) -> [[String]] {
         var result: [[String]] = []
