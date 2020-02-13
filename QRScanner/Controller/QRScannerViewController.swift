@@ -3,7 +3,7 @@ import UIKit
 class QRScannerViewController: UIViewController {
 
     let defaults = UserDefaults.standard
-    var orderNums = [String]()
+    var orderNums = [String: [String]]()
     var attendees = [String]()
     var scanned = [String]()
     
@@ -70,7 +70,7 @@ class QRScannerViewController: UIViewController {
 
                 let code = String(qrData!.codeString!.split(separator: "-")[1])
 
-                if isValid(data: code, compare: self.orderNums){
+                if isValid(data: code, compare: [String](self.orderNums.keys)){
                     let alertController = UIAlertController(title: "Valid ticket", message:
                            code, preferredStyle: .alert)
                        alertController.addAction(UIAlertAction(title: "Okay", style: .default,handler: {
@@ -78,7 +78,7 @@ class QRScannerViewController: UIViewController {
                                self.scannerView.startScanning()
                            }))
 //                       remove from list here
-                    self.orderNums.removeAll{$0 == code}
+                    self.orderNums.removeValue(forKey: code)
                     self.scanned.append(code)
                        self.present(alertController, animated: true, completion: nil)
                 }else{
@@ -141,8 +141,11 @@ class QRScannerViewController: UIViewController {
         let csvRows = csv(data: data!)
         
         for row in csvRows {
-            let pointsArr = row[0].components(separatedBy: ",")
-            self.orderNums.append(pointsArr[7])
+            if (row[0] != "") {
+                let pointsArr = row[0].components(separatedBy: ",")
+//              Values represent - 
+                self.orderNums[pointsArr[7]] = [pointsArr[2], pointsArr[3], pointsArr[4]]
+            }
         }
         print(self.orderNums)
         print(self.orderNums.count)
