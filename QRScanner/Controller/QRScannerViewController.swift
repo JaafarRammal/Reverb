@@ -11,6 +11,7 @@ import UIKit
 class QRScannerViewController: UIViewController {
 
     let defaults = UserDefaults.standard
+    var numberPeopleScanned = 0
     var orderNums = [String: [String]]()
     var attendees = [String]()
     var scanned = [String: [String]]()
@@ -29,58 +30,13 @@ class QRScannerViewController: UIViewController {
         }
     }
 
-
-//    @IBAction func importData(_ sender: Any) {
-//
-//        let alert = UIAlertController(title: "Restricted action", message: "Please enter admin password", preferredStyle: .alert)
-//
-//        alert.addTextField { (textField) in
-//            textField.text = ""
-//            textField.isSecureTextEntry = true
-//        }
-//
-//        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
-//            let textField = alert?.textFields![0] // Force unwrapping because we know it exists.
-//            if(textField?.text == "password"){
-//
-//                let alert = UIAlertController(title: "Sensitive action", message: "Please enter new data", preferredStyle: .alert)
-//
-//                alert.addTextField { (textField) in
-//                    textField.text = ""
-//                }
-//
-//                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
-//                    let textField = alert?.textFields![0] // Force unwrapping because we know it exists.
-//                    let arr = textField?.text?.components(separatedBy: ",")
-//                    self.defaults.set(arr, forKey: "attendees")
-//                    self.attendees = self.defaults.stringArray(forKey: "attendees")!
-//                    self.showToast(message : "Data updated successfully")
-//                }))
-//
-//                alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { [weak alert] (_) in
-//                    self.showToast(message : "Action cancelled")
-//                }))
-//
-//                self.present(alert, animated: true, completion: nil)
-//
-//            }else{
-//                self.showToast(message : "Incorrect password")
-//            }
-//
-//        }))
-//
-//        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { [weak alert] (_) in
-//        }))
-//
-//        self.present(alert, animated: true, completion: nil)
-//    }
-
     var qrData: QRData? = nil {
         didSet {
             if qrData != nil {
 
                 let code = String(qrData!.codeString!.split(separator: "-")[1])
-            
+                self.numTicketsScanned.text = String(self.numberPeopleScanned)
+
                 if isValid(data: code, compare: [String](self.orderNums.keys)){
                     let order = self.orderNums[code]!
                     var quantity = 0
@@ -92,10 +48,13 @@ class QRScannerViewController: UIViewController {
                                action in
                                self.scannerView.startScanning()
                            }))
-
+                    
+                    if (Int(order[1])! == 1) {
+                        self.numberPeopleScanned += 1
+                    }
+                    
                     if (Int(order[1])! > 1) {
-    //                        Have option to select number of tickets being scanned
-    //                        Handle cases for too large a quantity entered
+    //                        Need to handle input validation for when user enters too large a number of if user doesnt enter anything
                         var ticketsLeft = ""
                         if (self.scanned.keys.contains(code)) {
                             ticketsLeft = String(Int(order[1])! - Int(self.scanned[code]![1])!)
@@ -118,11 +77,11 @@ class QRScannerViewController: UIViewController {
                             }
 
                             if (quantity == Int(order[1])) {
-                                print("Got all")
                                 self.scanned[code] = self.orderNums[code]
                                 self.orderNums.removeValue(forKey: code)
+                                self.numberPeopleScanned += quantity
                             }
-                            else if ((quantity + Int(self.scanned[code]![1])! <= Int(order[1])!) && (quantity >= 0)) {
+                            else if ((quantity + Int(self.scanned[code]![1])! <= Int(order[1])!)) {
                                 var newList = self.scanned[code]
                                 newList![1] = String((Int(newList![1]) ?? 0) + quantity)
                                 self.scanned.updateValue(newList!, forKey: code)
@@ -130,26 +89,20 @@ class QRScannerViewController: UIViewController {
                                 if (self.scanned[code]![1] == self.orderNums[code]![1]) {
                                     self.orderNums.removeValue(forKey: code)
                                 }
-//                                print(self.scanned[code]![1])
+                                self.numberPeopleScanned += quantity
                             }
-                            
-                        else {
-                            print("HANDLE CHECK IF THEY TRY TO SCAN TOO MANY TICKETS")
-                            print(self.scanned[code]![1])
+                                
+                            else {
+                                print("HANDLE CHECK IF THEY TRY TO SCAN TOO MANY TICKETS")
+                                print(self.scanned[code]![1])
+                            }
+                            self.numTicketsScanned.text = String(self.numberPeopleScanned)
                         }
-                    }
                         ac.addAction(submitAction)
-//                        print(quantity)
                         present(ac, animated: true)
-
                     }
-                    print(quantity)
-
-//                    self.scanned[code] = self.orderNums[code]
-
-                  
                     self.present(alertController, animated: true, completion: nil)
-                    self.numTicketsScanned.text = String(self.scanned.keys.count)
+                    print(self.numberPeopleScanned)
                 }else{
                     var message_text = "Invalid ticket"
                     var output = code
@@ -168,6 +121,7 @@ class QRScannerViewController: UIViewController {
                         self.present(alertController, animated: true, completion: nil)
                     }
                 }
+            self.numTicketsScanned.text = String(self.numberPeopleScanned)
         }
     }
     
@@ -196,7 +150,7 @@ class QRScannerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if(!isKeyPresentInUserDefaults(key: "attendees")){
-            print("Initialized")
+//            print("Initialized")
             let arr = "0"
             self.defaults.set(arr, forKey: "attendees")
             if (self.attendees.count != 0) {
@@ -218,8 +172,9 @@ class QRScannerViewController: UIViewController {
                 self.orderNums[pointsArr[7]] = [pointsArr[2], pointsArr[3], pointsArr[4]]
             }
         }
-//        print(self.orderNums)
-//        print(self.orderNums.count)
+//        var myLabel = UILabel()
+        view.addSubview(ticketsScannedLabel)
+//        ticketsScannedLabel
         self.numTicketsScanned.text = "0"
     }
         
