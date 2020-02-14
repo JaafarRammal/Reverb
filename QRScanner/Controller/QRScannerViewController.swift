@@ -33,7 +33,8 @@ class QRScannerViewController: UIViewController {
     var qrData: QRData? = nil {
         didSet {
             if qrData != nil {
-
+                
+//                print(String(qrData!.codeString!))
                 let code = String(qrData!.codeString!.split(separator: "-")[1])
                 self.numTicketsScanned.text = String(self.numberPeopleScanned)
 
@@ -68,8 +69,11 @@ class QRScannerViewController: UIViewController {
                         let submitAction = UIAlertAction(title: "Submit", style: .default) { [unowned ac] _ in
                             
                             let answer = ac.textFields![0]
-                            quantity = Int(answer.text!)!
-                            
+                            if (Int(answer.text!) == nil) {
+                                quantity = 0
+                            } else {
+                                quantity = Int(answer.text!)!
+                            }
                             if !(self.scanned.keys.contains(code)) {
                                 var zeroList = self.orderNums[code]
                                 zeroList![1] = "0"
