@@ -33,8 +33,6 @@ class QRScannerViewController: UIViewController {
     var qrData: QRData? = nil {
         didSet {
             if qrData != nil {
-                
-//                print(String(qrData!.codeString!))
                 let code = String(qrData!.codeString!.split(separator: "-")[1])
                 self.numTicketsScanned.text = String(self.numberPeopleScanned)
 
@@ -55,7 +53,6 @@ class QRScannerViewController: UIViewController {
                     }
                     
                     if (Int(order[1])! > 1) {
-    //                        Need to handle input validation for when user enters too large a number of if user doesnt enter anything
                         var ticketsLeft = ""
                         if (self.scanned.keys.contains(code)) {
                             ticketsLeft = String(Int(order[1])! - Int(self.scanned[code]![1])!)
@@ -97,8 +94,9 @@ class QRScannerViewController: UIViewController {
                             }
                                 
                             else {
-                                print("HANDLE CHECK IF THEY TRY TO SCAN TOO MANY TICKETS")
-                                print(self.scanned[code]![1])
+                                let tooManyTicketsAlert = UIAlertController(title: "Invalid amount", message: "Customer only has " + ticketsLeft + " tickets left", preferredStyle: UIAlertController.Style.alert)
+                                tooManyTicketsAlert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler: nil))
+                                self.present(tooManyTicketsAlert, animated: true, completion: nil)
                             }
                             self.numTicketsScanned.text = String(self.numberPeopleScanned)
                         }
@@ -154,7 +152,6 @@ class QRScannerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if(!isKeyPresentInUserDefaults(key: "attendees")){
-//            print("Initialized")
             let arr = "0"
             self.defaults.set(arr, forKey: "attendees")
             if (self.attendees.count != 0) {
@@ -176,9 +173,7 @@ class QRScannerViewController: UIViewController {
                 self.orderNums[pointsArr[7]] = [pointsArr[2], pointsArr[3], pointsArr[4]]
             }
         }
-//        var myLabel = UILabel()
         view.addSubview(ticketsScannedLabel)
-//        ticketsScannedLabel
         self.numTicketsScanned.text = "0"
     }
         
@@ -230,9 +225,6 @@ extension QRScannerViewController: QRScannerViewDelegate {
     func qrScanningSucceededWithCode(_ str: String?) {
         self.qrData = QRData(codeString: str)
     }
-
-
-
 }
 
 func isValid(data: String, compare: [String]) -> Bool {
