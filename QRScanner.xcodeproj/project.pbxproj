@@ -15,7 +15,8 @@
 		9236851D22362675005C1AD7 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9236851A22362675005C1AD7 /* QRScannerView.swift */; };
 		9236852322362B1C005C1AD7 /* QRData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9236852222362B1C005C1AD7 /* QRData.swift */; };
 		92368528223635AB005C1AD7 /* UIViewController+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92368527223635AB005C1AD7 /* UIViewController+Alert.swift */; };
-		E81318AA23F5924700CB2506 /* Afrogala.csv in Resources */ = {isa = PBXBuildFile; fileRef = E81318A923F5924700CB2506 /* Afrogala.csv */; };
+		E8BF6ECC23F8677F00695667 /* Afrogala.csv in Resources */ = {isa = PBXBuildFile; fileRef = E8BF6ECB23F8677F00695667 /* Afrogala.csv */; };
+		E8BF6ECE23F8689200695667 /* Afrogala - Ticket information.csv in Resources */ = {isa = PBXBuildFile; fileRef = E8BF6ECD23F8689200695667 /* Afrogala - Ticket information.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +30,8 @@
 		9236851A22362675005C1AD7 /* QRScannerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		9236852222362B1C005C1AD7 /* QRData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRData.swift; sourceTree = "<group>"; };
 		92368527223635AB005C1AD7 /* UIViewController+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Alert.swift"; sourceTree = "<group>"; };
-		E81318A923F5924700CB2506 /* Afrogala.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Afrogala.csv; path = ../../../../../../Downloads/Afrogala.csv; sourceTree = "<group>"; };
+		E8BF6ECB23F8677F00695667 /* Afrogala.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Afrogala.csv; path = ../../../../../../Downloads/Afrogala.csv; sourceTree = "<group>"; };
+		E8BF6ECD23F8689200695667 /* Afrogala - Ticket information.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "Afrogala - Ticket information.csv"; path = "../../../../../../Downloads/Afrogala - Ticket information.csv"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,8 +88,9 @@
 		9236852122362B04005C1AD7 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				E81318A923F5924700CB2506 /* Afrogala.csv */,
+				E8BF6ECB23F8677F00695667 /* Afrogala.csv */,
 				9236851922362675005C1AD7 /* QRScannerViewController.swift */,
+				E8BF6ECD23F8689200695667 /* Afrogala - Ticket information.csv */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -175,8 +178,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				9236851B22362675005C1AD7 /* Main.storyboard in Resources */,
-				E81318AA23F5924700CB2506 /* Afrogala.csv in Resources */,
 				92368511223624F8005C1AD7 /* LaunchScreen.storyboard in Resources */,
+				E8BF6ECC23F8677F00695667 /* Afrogala.csv in Resources */,
+				E8BF6ECE23F8689200695667 /* Afrogala - Ticket information.csv in Resources */,
 				9236850E223624F8005C1AD7 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

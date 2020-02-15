@@ -101,7 +101,16 @@ class QRScannerViewController: UIViewController {
                                self.scannerView.startScanning()
                            }))
                     
-                    if (Int(order[1])! == 1) {
+                    if ((Int(order[1])! -  Int(order[3])!) == 1) {
+                        if (onlyBoth) {
+                            self.both[code]![3] = order[1]
+                        } else {
+                            if (self.currEvent == EventType.MAINEVENT) {
+                                self.mainEvent[code]![3] = order[1]
+                            } else {
+                                self.afterParty[code]![3] = order[1]
+                            }
+                        }
                         self.numberPeopleScanned += 1
                     }
                     
@@ -254,10 +263,20 @@ class QRScannerViewController: UIViewController {
 //
 //                            }
 //                        }
-                        if (comparisonList[code]![3] == comparisonList[code]![1] && self.both[code]![3] == self.both[code]![1]) {
-                            message_text = "Ticket already scanned"
-                            output = showCustomerTickets(code: code, isInvalid: true)
-                        }
+                        message_text = "Ticket already scanned"
+                        output = showCustomerTickets(code: code, isInvalid: true)
+//                        var comparison = true
+//                        if comparisonList.keys.contains(code) {
+//                            if (comparisonList[code]![3] == comparisonList[code]![1]) {
+//                                comparison = true
+//                            }
+//                        }
+//                        if self.both.keys.contains(code) {
+//                            if (self.both[code]![3] == self.both[code]![1]) {
+//                                message_text = "Ticket already scanned"
+//                                output = showCustomerTickets(code: code, isInvalid: true)
+//                            }
+//                        }
                     }
                     let alertController = UIAlertController(title: message_text, message:
                             output, preferredStyle: .alert)
@@ -308,7 +327,7 @@ class QRScannerViewController: UIViewController {
                 self.attendees = self.defaults.stringArray(forKey: "attendees")!
             }
         }
-        var data = readDataFromCSV(fileName: "Afrogala", fileType: ".csv")
+        var data = readDataFromCSV(fileName: "Afrogala - Ticket information", fileType: ".csv")
         data = cleanRows(file: data!)
         let csvRows = csv(data: data!)
         
@@ -331,6 +350,9 @@ class QRScannerViewController: UIViewController {
             }
         }
 //        print(self.both)
+        print(self.mainEvent)
+        print(self.afterParty)
+        print(self.both)
         self.numTicketsScanned.text = "0"
     }
         
@@ -421,6 +443,8 @@ class QRScannerViewController: UIViewController {
         var result = false
         let dealingWithCombo = self.both.keys.contains(data)
         print("checking this combo ")
+        print(compare)
+        print(compare.keys.contains(data))
         if(compare.keys.contains(data)){
             result = compare[data]![1] > compare[data]![3]
             print("in first if")
@@ -432,7 +456,7 @@ class QRScannerViewController: UIViewController {
         
         if (self.both.keys.contains(data)) {
             print("yaay over here ")
-            result = self.both[data]![1] > self.both[data]![3] || result 
+            result = self.both[data]![1] > self.both[data]![3] || result
         }
         return result
     }
