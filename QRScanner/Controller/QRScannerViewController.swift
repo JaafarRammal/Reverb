@@ -67,8 +67,10 @@ class QRScannerViewController: UIViewController {
                 self.numTicketsScanned.text = String(self.numberPeopleScanned)
                 var comparisonList = [String: [String]]()
                 var otherList = [String: [String]]()
-                print(comparisonList)
-                print(self.mainEvent)
+                var onlyBoth = false
+
+//                print(comparisonList)
+//                print(self.mainEvent)
                 if (self.currEvent == EventType.MAINEVENT) {
                     comparisonList = self.mainEvent
                     otherList = self.afterParty
@@ -76,11 +78,18 @@ class QRScannerViewController: UIViewController {
                     comparisonList = self.afterParty
                     otherList = self.afterParty
                 }
-                print("Current comparison list")
-                print(comparisonList)
+                if !(comparisonList.keys.contains(code)) {
+                    comparisonList = self.both
+                    onlyBoth = true
+                }
+                
+//                print("Current comparison list")
+//                print(comparisonList)
                 if isValid(data: code, compare: comparisonList){
+                 
                     let order = comparisonList[code]!
                     var quantity = 0
+//                    var quantity1 = 0
                     let output = showCustomerTickets(code: code, isInvalid: false)
 
                     let alertController = UIAlertController(title: "Valid ticket", message:
@@ -100,45 +109,79 @@ class QRScannerViewController: UIViewController {
                         let messageText = showCustomerTickets(code: code, isInvalid: false) + "\n Please enter the number you would like to scan off this ticket or alternatively click 'Scan all'"
                         
                         let ac = UIAlertController(title: titleText, message: messageText, preferredStyle: .alert)
-                        ac.addTextField()
+                        if !(onlyBoth) {
+                            ac.addTextField() { (textField) in
+                                textField.placeholder = "No. of show and food tickets to scan?"
+                            }
+                        }
+                        
+                        if (self.both.keys.contains(code)) {
+                            ac.addTextField() { (textField) in
+                                textField.placeholder = "No. of combo tickets to scan?"
+                            }
+                        }
+
                         let submitAction = UIAlertAction(title: "Submit", style: .default) { [unowned ac] _ in
                             
-                            let answer = ac.textFields![0]
-                            if (Int(answer.text!) == nil) {
-                                quantity = 0
+                            let mainVal = ac.textFields![0]
+                            var mainAnswer = 0
+//                            Extract later to function
+                            if (Int(mainVal.text!) == nil) {
+                                mainAnswer = 0
                             } else {
-                                quantity = Int(answer.text!)!
+                                mainAnswer = Int(mainVal.text!)!
                             }
-                            if !(self.scanned.keys.contains(code)) {
-                                var zeroList = comparisonList[code]
-                                zeroList![1] = "0"
-                                self.scanned[code] = zeroList
+                            
+                            let mainScan = Int(order[3])! + mainAnswer
+                            
+                            var bothAnswer = 0
+                            var bothScan = 0
+
+                            if (self.both.keys.contains(code)) {
+                                let bothVal = ac.textFields![1]
+                                if (Int(bothVal.text!) == nil) {
+                                    bothAnswer = 0
+                                } else {
+                                    bothAnswer = Int(bothVal.text!)!
+                                }
+                                bothScan = Int(self.both[code]![3])! + bothAnswer
                             }
 
-                            if (quantity == Int(order[1])) {
-                                self.scanned[code] = comparisonList[code]
-                                comparisonList.removeValue(forKey: code)
-                                self.numberPeopleScanned += quantity
+                            if (mainAnswer == 0) {
+                                quantity += 0
+                            } else {
+                                quantity += mainAnswer
                             }
-                            else if ((quantity + Int(self.scanned[code]![1])! <= Int(order[1])!)) {
-                                var newList = self.scanned[code]
-                                newList![1] = String((Int(newList![1]) ?? 0) + quantity)
-                                self.scanned.updateValue(newList!, forKey: code)
-                                
-                                if (self.scanned[code]![1] == comparisonList[code]![1]) {
-                                    comparisonList.removeValue(forKey: code)
-                                }
-                                self.numberPeopleScanned += quantity
+
+                            if (bothAnswer == 0) {
+                                quantity += 0
+                            } else {
+                                quantity += bothAnswer
                             }
-                                
-                            else {
-                                var ticketsLeft = ""
-                                if (self.scanned.keys.contains(code)) {
-                                    ticketsLeft = String(Int(order[1])! - Int(self.scanned[code]![1])!)
-                                } else {
-                                    ticketsLeft = order[1]
+
+                            var comboValid = true
+                            if (self.both.keys.contains(code)){
+                                comboValid = bothScan <= Int(self.both[code]![1])!
+                            }
+                            
+                            if (mainScan <= Int(order[1])! && comboValid) {
+                                print(bothAnswer)
+                                if (self.both.keys.contains(code)) {
+                                    print(self.both[code]![3])
+                                    self.both[code]![3] = String(Int(self.both[code]![3])! + bothAnswer)
                                 }
-                                let tooManyTicketsAlert = UIAlertController(title: "Invalid amount", message: "Customer only has " + ticketsLeft + " tickets left", preferredStyle: UIAlertController.Style.alert)
+                                
+                                if (!onlyBoth) {
+                                    if (self.currEvent == EventType.MAINEVENT ) {
+                                        self.mainEvent[code]![3] = String(Int(self.mainEvent[code]![3])! + mainAnswer)
+                                    } else {
+                                        self.afterParty[code]![3] = String(Int(self.afterParty[code]![3])! + mainAnswer)
+                                    }
+                                }
+
+                                self.numberPeopleScanned += quantity
+                            } else {
+                                let tooManyTicketsAlert = UIAlertController(title: "Invalid amount", message: "Customer does not have that many tickets left, please re-scan", preferredStyle: UIAlertController.Style.alert)
                                 tooManyTicketsAlert.addAction(UIAlertAction(title: "Continue", style: UIAlertAction.Style.default, handler: nil))
                                 self.present(tooManyTicketsAlert, animated: true, completion: nil)
                             }
@@ -177,13 +220,20 @@ class QRScannerViewController: UIViewController {
                         present(ac, animated: true)
                     }
                     self.present(alertController, animated: true, completion: nil)
-                    print(self.numberPeopleScanned)
+//                    print(self.numberPeopleScanned)
                 }else{
                     var message_text = "Invalid ticket"
                     var output = code
-
+                    
+//                    if (onlyBoth)
+                    
                     if (comparisonList.keys.contains(code) || self.both.keys.contains(code)){
-                        if (comparisonList[code]![3] == comparisonList[code]![1] || self.both[code]![3] == self.both[code]![1]) {
+//                        if comparisonList.keys.contains(code) {
+//                            if (comparisonList[code]![3] == comparisonList[code]![1]) {
+//
+//                            }
+//                        }
+                        if (comparisonList[code]![3] == comparisonList[code]![1] && self.both[code]![3] == self.both[code]![1]) {
                             message_text = "Ticket already scanned"
                             output = showCustomerTickets(code: code, isInvalid: true)
                         }
@@ -259,7 +309,7 @@ class QRScannerViewController: UIViewController {
                 }
             }
         }
-        print(self.both)
+//        print(self.both)
         self.numTicketsScanned.text = "0"
     }
         
@@ -298,19 +348,37 @@ class QRScannerViewController: UIViewController {
     
     func showCustomerTickets(code: String, isInvalid: Bool) -> String {
         var order: [String]
-        if (self.currEvent == EventType.MAINEVENT) {
-            order = self.mainEvent[code]!
-        } else {
-            order = self.afterParty[code]!
-        }
         var left: Int
-        if !(isInvalid) {
-            left = Int(order[1])! - Int(order[3])!
+        var output = ""
+        
+        var prevSet = false
+//        if (self.main)
+        if (self.currEvent == EventType.MAINEVENT) {
+            if (self.mainEvent.keys.contains(code)) {
+                order = self.mainEvent[code]!
+                prevSet = true
+                if !(isInvalid) && prevSet {
+                   left = Int(order[1])! - Int(order[3])!
+               } else {
+                   left = Int(order[1])!
+               }
+                output += order[0] + "\n" + order[2] + ": " + String(left)
+            }
         } else {
-            left = Int(order[1])!
+            if (self.afterParty.keys.contains(code)) {
+                order = self.afterParty[code]!
+                prevSet = true
+                if !(isInvalid) && prevSet {
+                   left = Int(order[1])! - Int(order[3])!
+               } else {
+                   left = Int(order[1])!
+               }
+                output += order[0] + "\n" + order[2] + ": " + String(left)
+            }
         }
+       
 
-        var output = order[0] + "\n" + order[2] + ": " + String(left)
+        
         if (self.both.keys.contains(code)) {
             order = self.both[code]!
             var left: Int
@@ -319,16 +387,28 @@ class QRScannerViewController: UIViewController {
             } else {
                 left = Int(order[1])!
             }
+            if !(prevSet) {
+                output += order[0]
+            }
             output += "\n" + order[2] + ": " + String(left)
         }
         return output
     }
     
     func isValid(data: String, compare: [String: [String]]) -> Bool {
-        if(compare.keys.contains(data) || self.both.keys.contains(data)){
-            return (compare[data]![1] > compare[data]![3] || self.both[data]![1] > self.both[data]![3])
+        var result = false
+        var dealingWithCombo = self.both.keys.contains(data)
+        if(compare.keys.contains(data)){
+            result = compare[data]![1] > compare[data]![3]
+            if (!result && !dealingWithCombo) {
+                return false
+            }
         }
-        return false
+        
+        if (self.both.keys.contains(data)) {
+            result = self.both[data]![1] > self.both[data]![3]
+        }
+        return result
     }
     
 }
