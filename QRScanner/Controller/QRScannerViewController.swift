@@ -263,13 +263,26 @@ class QRScannerViewController: UIViewController {
             if (row[0] != "") {
                 let pointsArr = row[0].components(separatedBy: ",")
                 let code = pointsArr[7]
-                let valuesList = [pointsArr[2], pointsArr[3], pointsArr[4], "0"]
 //              Values represent - name, ticket quantity, ticket type, number tickets scanned
-                self.orderNums[pointsArr[7]] = valuesList
+                var valuesList = [pointsArr[2], pointsArr[3], pointsArr[4], "0"]
+//                self.orderNums[pointsArr[7]] = valuesList
+                
                 if (valuesList[2] == "Afterparty only") {
                     self.afterParty[code] = valuesList
                 }
-                if (valuesList[2] == "Show + Food") {
+                if (valuesList[2] == "Thursday show only" || valuesList[2] == "THURSDAY FLASH SALE") {
+                    self.mainEvent[code] = valuesList
+                }
+                if (valuesList[2] == "Thursday Group of 6") {
+                    valuesList[3] = "6"
+                    self.mainEvent[code] = valuesList
+                }
+                if (valuesList[2] == "Thursday Group of 6") {
+                    valuesList[3] = "6"
+                    self.mainEvent[code] = valuesList
+                }
+                if (valuesList[2] == "Thursday Group of 6") {
+                    valuesList[3] = "6"
                     self.mainEvent[code] = valuesList
                 }
                 if (valuesList[2] == "Show + Afterparty + Food") {
@@ -317,11 +330,12 @@ class QRScannerViewController: UIViewController {
         var order: [String]
         var left: Int
         var output = ""
-        
+        var nameSet = false
         var prevSet = false
-        if (self.currEvent == EventType.MAINEVENT) {
+        
             if (self.mainEvent.keys.contains(code)) {
                 order = self.mainEvent[code]!
+                nameSet = true
                 prevSet = true
                 if !(isInvalid) && prevSet {
                    left = Int(order[1])! - Int(order[3])!
@@ -330,7 +344,7 @@ class QRScannerViewController: UIViewController {
                }
                 output += order[0] + "\n" + order[2] + ": " + String(left)
             }
-        } else {
+       
             if (self.afterParty.keys.contains(code)) {
                 order = self.afterParty[code]!
                 prevSet = true
@@ -339,9 +353,9 @@ class QRScannerViewController: UIViewController {
                } else {
                    left = Int(order[1])!
                }
-                output += order[0] + "\n" + order[2] + ": " + String(left)
+                output += (nameSet ? "" : order[0]) + "\n" + order[2] + ": " + String(left)
             }
-        }
+        
        
         if (self.both.keys.contains(code)) {
             order = self.both[code]!
@@ -351,10 +365,7 @@ class QRScannerViewController: UIViewController {
             } else {
                 left = Int(order[1])!
             }
-            if !(prevSet) {
-                output += order[0]
-            }
-            output += "\n" + order[2] + ": " + String(left)
+            output += (nameSet ? "" : order[0]) + "\n" + order[2] + ": " + String(left)
         }
         return output
     }
@@ -392,8 +403,6 @@ extension QRScannerViewController: QRScannerViewDelegate {
         self.qrData = QRData(codeString: str)
     }
 }
-
-
 
 func isKeyPresentInUserDefaults(key: String) -> Bool {
     return UserDefaults.standard.object(forKey: key) != nil
