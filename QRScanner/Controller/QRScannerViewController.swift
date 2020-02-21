@@ -101,12 +101,27 @@ class QRScannerViewController: UIViewController {
                                self.scannerView.startScanning()
                            }))
                     
-                    if ((Int(order[1])! -  Int(order[3])!) == 1) {
+                    var oneOfEach = false
+                    var multipleForCombo = false
+                    if (!onlyBoth && self.both.keys.contains(code)) {
+                        oneOfEach = Int(self.both[code]![1])! - Int(self.both[code]![3])! == 1
+                        multipleForCombo = Int(self.both[code]![1])! - Int(self.both[code]![3])! >= 1
+                    }
+                    
+                    
+                    if ((Int(order[1])! -  Int(order[3])!) == 1 && oneOfEach) {
                         if (onlyBoth) {
                             self.both[code]![3] = order[1]
                         } else {
                             if (self.currEvent == EventType.MAINEVENT) {
                                 self.mainEvent[code]![3] = order[1]
+                                if (self.both.keys.contains(code)) {
+                                    if (Int(self.both[code]![1])! - Int(self.both[code]![3])! == 1) {
+                                        self.both[code]![3] = self.both[code]![1]
+                                        self.numberPeopleScanned += 1
+                                        multipleForCombo = false
+                                    }
+                                }
                             } else {
                                 self.afterParty[code]![3] = order[1]
                             }
@@ -114,24 +129,32 @@ class QRScannerViewController: UIViewController {
                         self.numberPeopleScanned += 1
                     }
                     
-                    if (Int(order[1])! > 1) {
+                    if (Int(self.both[code]![1])! - Int(self.both[code]![3])! == 1 && !self.mainEvent.keys.contains(code)) {
+                        self.both[code]![3] = self.both[code]![1]
+                        self.numberPeopleScanned += 1
+                    }
+
+                    
+                    if ((Int(order[1])! -  Int(order[3])!) > 1 || multipleForCombo) {
                    
                         let titleText = "Valid ticket"
-                        let messageText = showCustomerTickets(code: code, isInvalid: false) + "\n Please enter the number you would like to scan off this ticket or alternatively click 'Scan all'"
+                        let messageText = showCustomerTickets(code: code, isInvalid: false)
                         
                         let ac = UIAlertController(title: titleText, message: messageText, preferredStyle: .alert)
-                        if !(onlyBoth) {
-                            ac.addTextField() { (textField) in
-                                textField.placeholder = "No. of show and food tickets to scan?"
-                            }
+//                        if !(onlyBoth) {
+                        ac.addTextField() { (textField) in
+                            textField.placeholder = "No. of show tickets"
                         }
+//                        }
                         
-                        if (self.both.keys.contains(code)) {
-                            ac.addTextField() { (textField) in
-                                textField.placeholder = "No. of combo tickets to scan?"
-                            }
+//                        if (self.both.keys.contains(code)) {
+                        ac.addTextField() { (textField) in
+                            textField.placeholder = "No. of show + afterparty tickets"
                         }
-
+//                        }
+                        ac.addTextField() { (textField) in
+                            textField.placeholder = "No. of afterparty tickets"
+                        }
                         let submitAction = UIAlertAction(title: "Submit", style: .default) { [unowned ac] _ in
                             print("Scanned here ")
                             let mainVal = ac.textFields![0]
@@ -143,19 +166,36 @@ class QRScannerViewController: UIViewController {
                                 mainAnswer = Int(mainVal.text!)!
                             }
                             
-                            let mainScan = Int(order[3])! + mainAnswer
+                            var mainScan = Int(order[3])! + mainAnswer
+                            if !(self.mainEvent.keys.contains(code)) {
+                                mainScan = 0
+                            }
+                            
+                            var afterPartyAnswer = 0
+                            let afterPartyVal = ac.textFields![2]
+                            
+                            if self.afterParty.keys.contains(code) {
+                                if (Int(afterPartyVal.text!) == nil) {
+                                    afterPartyAnswer = 0
+                                } else {
+                                    afterPartyAnswer = Int(afterPartyVal.text!)!
+                                }
+                            } else {
+                                afterPartyAnswer = 0
+                            }
                             
                             var bothAnswer = 0
                             var bothScan = 0
 //                            print("and also here ")
+                            let bothVal = ac.textFields![1]
 
                             if (self.both.keys.contains(code)) {
 //                                print("and also here in the check")
-                                var textField = 0
-                                if !(onlyBoth) {
-                                    textField = 1
-                                }
-                                let bothVal = ac.textFields![textField]
+//                                var textField = 1
+//                                if !(onlyBoth) {
+//                                    textField = 1
+//                                }
+//                                let bothVal = ac.textFields![1]
 //                                print("and also here in the check after addingment")
 
                                 if (Int(bothVal.text!) == nil) {
@@ -167,10 +207,15 @@ class QRScannerViewController: UIViewController {
 
                                 }
                                 bothScan = Int(self.both[code]![3])! + bothAnswer
+                            } else {
+                                bothScan = 0
                             }
-//                            print("and also here after checking both contains the code")
+                            
+                            
+                            print("seeing the total counted ")
                             print(bothAnswer)
                             print(mainAnswer)
+                            print(afterPartyAnswer)
 //                            if (mainAnswer == 0) {
 //                                quantity += 0
 //                            } else {
@@ -185,15 +230,29 @@ class QRScannerViewController: UIViewController {
 //                            } else {
                             quantity += bothAnswer
 //                            }
-
                             var comboValid = true
+
+                            var afterpartytotal = "0"
+                            if (self.afterParty.keys.contains(code)) {
+                                afterpartytotal = String(Int(self.afterParty[code]![3])! + afterPartyAnswer)
+                                comboValid = Int(afterpartytotal)! <= Int(self.afterParty[code]![1])!
+                            }
+                            
                             if (self.both.keys.contains(code)){
                                 comboValid = bothScan <= Int(self.both[code]![1])!
                             }
-                            print("and also here after combovalid check 169 ")
+//                            print("and also here after combovalid check 169 ")
+                            
 
                             if (mainScan <= Int(order[1])! && comboValid) {
 //                                print(bothAnswer)
+                                
+                                if (self.afterParty.keys.contains(code)) {
+                                    self.afterParty[code]![3] = String(Int(self.afterParty[code]![3])! + afterPartyAnswer)
+                                    self.numberPeopleScanned += afterPartyAnswer
+
+                                }
+                                
                                 if (self.both.keys.contains(code)) {
 //                                    print(self.both[code]![3])
                                     self.both[code]![3] = String(Int(self.both[code]![3])! + bothAnswer)
@@ -215,7 +274,6 @@ class QRScannerViewController: UIViewController {
                             }
                             self.numTicketsScanned.text = String(self.numberPeopleScanned)
                             print("and also here at the end now ")
-
                         }
                         
                         let scanAllAction = UIAlertAction(title: "Scan all", style: .default) {  _ in
@@ -225,6 +283,10 @@ class QRScannerViewController: UIViewController {
                                 if (self.currEvent == EventType.MAINEVENT) {
                                     quantity += Int(self.mainEvent[code]![1])! - Int(self.mainEvent[code]![3])!
                                     self.mainEvent[code]![3] = self.mainEvent[code]![1]
+                                    if (self.afterParty.keys.contains(code)) {
+                                        self.afterParty[code]![3] = self.afterParty[code]![1]
+                                        quantity += Int(self.afterParty[code]![1])! - Int(self.afterParty[code]![3])!
+                                    }
                                 } else {
                                     quantity += Int(self.afterParty[code]![1])! - Int(self.afterParty[code]![3])!
                                     self.afterParty[code]![3] = self.afterParty[code]![1]
@@ -402,6 +464,8 @@ class QRScannerViewController: UIViewController {
         
         var prevSet = false
 //        if (self.main)
+        var toAdd = ""
+        var afterexists = false
         if (self.currEvent == EventType.MAINEVENT) {
             if (self.mainEvent.keys.contains(code)) {
                 order = self.mainEvent[code]!
@@ -412,6 +476,17 @@ class QRScannerViewController: UIViewController {
                    left = Int(order[1])!
                }
                 output += order[0] + "\n" + order[2] + ": " + String(left)
+            }
+            if (self.afterParty.keys.contains(code)) {
+                order = self.afterParty[code]!
+                prevSet = true
+                if !(isInvalid) && prevSet {
+                    left = Int(order[1])! - Int(order[3])!
+                } else {
+                    left = Int(order[1])!
+                }
+                toAdd += "\n" + order[2] + ": " + String(left)
+                afterexists = true
             }
         } else {
             if (self.afterParty.keys.contains(code)) {
@@ -441,6 +516,11 @@ class QRScannerViewController: UIViewController {
             }
             output += "\n" + order[2] + ": " + String(left)
         }
+        
+        if (afterexists) {
+            output += toAdd
+        }
+        
         return output
     }
     
