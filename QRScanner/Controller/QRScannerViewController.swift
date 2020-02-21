@@ -327,25 +327,31 @@ class QRScannerViewController: UIViewController {
                 self.attendees = self.defaults.stringArray(forKey: "attendees")!
             }
         }
-        var data = readDataFromCSV(fileName: "Afrogala - Ticket information", fileType: ".csv")
+        var data = readDataFromCSV(fileName: "Culture Shock - Tickets", fileType: ".csv")
         data = cleanRows(file: data!)
         let csvRows = csv(data: data!)
         
         for row in csvRows {
             if (row[0] != "") {
                 let pointsArr = row[0].components(separatedBy: ",")
-                let code = pointsArr[7]
-                let valuesList = [pointsArr[2], pointsArr[3], pointsArr[4], "0"]
+                let code = pointsArr[6]
+                var valuesList = [pointsArr[1], pointsArr[3], pointsArr[2], "0"]
+                print(code)
+                print(valuesList)
 //              Values represent - name, ticket quantity, ticket type, number tickets scanned
                 self.orderNums[pointsArr[7]] = valuesList
-                if (valuesList[2] == "Afterparty only") {
+                if (valuesList[2] == "Afterparty") {
                     self.afterParty[code] = valuesList
                 }
-                if (valuesList[2] == "Show + Food") {
+                if (valuesList[2] == "Friday Show+Food" || valuesList[2] == "Friday FLASH SALE SHOW + FOOD" ) {
                     self.mainEvent[code] = valuesList
                 }
-                if (valuesList[2] == "Show + Afterparty + Food") {
+                if (valuesList[2] == "Friday Show+Food+Afterparty") {
                     self.both[code] = valuesList
+                }
+                if (valuesList[2] == "Friday Group of 5") {
+                    valuesList[1] = "5"
+                    self.mainEvent[code] = valuesList
                 }
             }
         }
